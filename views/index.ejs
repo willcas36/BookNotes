@@ -1,0 +1,38 @@
+<%- include ('partials/header.ejs') %>
+    <div>
+        <h1>William Quiñones</h1>
+        <h2>Books i've read</h2>
+        <p>
+            Resumen detallado de todos los libros que he leído. Se usará un código USBN para encotrar portadas de los libros que se añadan.
+        </p>
+        <form action="/newBook" method="get">
+            <input type="submit" name="newBook" value="New Book">
+        </form>
+    </div>
+    <hr>
+    <%  for (let book of books){%>
+    <div class="books">
+        <img src="https://covers.openlibrary.org/b/id/<%= book.coverid%>-M.jpg" alt="Cubierta de Libro">
+        <section class="description">
+            <h2>
+                <%= book.title %>
+            </h2>
+            <h3>
+                <%= book.author %>
+            </h3>
+            <ul>
+                <li>Date Read: <%= new Date()%></li>
+                <li>Rate: <%= book.rate%>/5</li>
+            </ul>
+            <p>
+                <%= book.summary %>
+            </p>
+        </section>
+        <form>
+            <button type="submit" value="<%= book.id %>" name="bookId" formaction="/edit" formmethod="post">Edit</button>
+            <button type="submit" value="<%= book.id %>" name="bookId" formaction="/delete" formmethod="post">Delete</button>
+        </form>
+    </div>
+    <hr>
+    <% } %>
+<%- include ('partials/footer') %>

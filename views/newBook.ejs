@@ -1,0 +1,26 @@
+<%- include ('partials/header.ejs') %>
+
+<div class="container">
+
+    <h1><%= heading %></h1>
+    <div class="box-form">
+        <% if (locals.books) { %>
+        <form class="form" id="form" action="/book/edit" method="post">
+            <input type="text" name="title" value="<%=books.title%>">
+            <input type="text" name="summary" value="<%=books.summary %>">
+            <input type="text" name="author" value="<%=books.author %>">
+            <input type="number" name="rate" value="<%=books.rate %>">
+            <input type="hidden" name="id" value="<%= books.id %>">
+            <button type="submit"><%=submit%></button>
+        </form>
+        <%} else {%>
+        <form class="form" action="/newBook" method="post">
+            <input type="text" name="title" placeholder="Book title">
+            <input type="text" name="summary" placeholder="Book summary">
+            <input type="number" name="rate" placeholder="Books rate" min="1" max="5">
+            <button type="submit"><%=submit%></button>
+        </form>
+        <% } %>
+    </div>
+</div>
+<%- include ('partials/footer.ejs') %>
