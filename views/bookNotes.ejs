@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/main.css">
+    <title>Book Notes</title>
+</head>
+<body>
+
+
+<div class="books">
+    <section class="description">
+        <img src="https://covers.openlibrary.org/b/id/<%= book.coverid%>-M.jpg" alt="Cubierta de Libro">
+        <h2>
+            <%= book.title %>
+        </h2>
+        <h3>
+            <%= book.author %>
+        </h3>
+        <ul>
+            <li>ID: <%= book.coverid %></li>
+            <li>Date Read: <%= new Date()%></li>
+            <li>Rate: <%= book.rate%>/5</li>
+        </ul>
+        <form>
+            <button type="submit" formaction="/book/newNote/<%= book.id %>" formmethod="get">New note</button>
+        </form>
+    </section>
+    <p>
+        <%= book.summary %>
+    </p>
+    <h3>My notes</h3>
+    <%for(let note of notes){%>
+    <p>
+        <%= note.content %>
+    </p>
+    <div>
+        <form>
+            <button type="submit" formaction="/book/<%= book.id %>/note/<%= note.id %>/edit" formmethod="get">Edit</button>
+            <button type="submit" formaction="/book/<%= book.id %>/note/<%= note.id %>/delete" formmethod="get">delete</button>
+        </form>
+        <p>Page: <%= note.page %></p>
+    </div>
+    <% } %>
+</div>
+
+</body>
+
+</html>

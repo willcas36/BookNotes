@@ -48,6 +48,7 @@ app.get('/newBook', async (req, res) => {
             submit: "Create Book" 
         });
     }catch(error){  
+        
         res.status(500).json({message: error.message});
     }
 });
@@ -69,14 +70,12 @@ app.post('/newBook', async (req, res) => {
         res.status(500).json({message: error.message});
     }
 });
-app.post('/edit', async (req, res) => {
+app.get('/book/:id/edit', async (req, res) => {
     try {
-        const book = await getBook(req.body.bookId);
-        console.log(req.params.id);
-        console.log(req.body.bookId);
+        const book = await getBook(req.params.id);
         console.log(book[0]);
         res.render('newBook.ejs',{
-            books: book[0],
+            book: book[0],
             heading: "Edit Book",
             submit: "Update Book" 
     })
@@ -84,19 +83,90 @@ app.post('/edit', async (req, res) => {
         res.status(500).json({message: error.message});
     }
 });
-app.post('/book/edit', async (req, res) => {
+app.post('/book/:id/edit', async (req, res) => {
     try {
-        await db.query("UPDATE books SET title = $1, rate = $2, author = $3, summary= $4 WHERE id = $5",[req.body.title, req.body.rate, req.body.author, req.body.summary, req.body.id]);
+        await db.query("UPDATE books SET title = $1, rate = $2, author = $3, summary= $4 WHERE id = $5",[req.body.title, req.body.rate, req.body.author, req.body.summary, req.params.id]);
         res.redirect('/');
     } catch (error) {
         res.status(500).json({message: error.message});
     }
 })
-app.post('/delete', async (req, res) => {
+app.get('/book/:id/delete', async (req, res) => {
     try {
-        console.log(req.body.bookId);
-        await db.query("DELETE FROM books WHERE id = $1",[req.body.bookId]);
+
+        await db.query("DELETE FROM notes WHERE bid = $1",[req.params.id]);
+        await db.query("DELETE FROM books WHERE id = $1",[req.params.id]);
         res.redirect('/');
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+})
+app.get("/book/:id/notes", async (req, res) => {
+    try {
+        console.log(req.params.id);
+        const value = await db.query("SELECT notes.id, notes.content, notes.page, notes.bid FROM notes join books on books.id = notes.bid where books.id= $1 ",[req.params.id]);
+        const notes = value.rows;
+        console.log(notes);
+       // console.log(value);
+        const book = await getBook(req.params.id);
+        res.render('bookNotes.ejs',{
+            notes: notes,
+            book: book[0]
+        })
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+})
+app.get('/book/newNote/:id', async (req, res) => {
+    try {
+        res.render('newBook.ejs',{
+            id: req.params.id,
+            heading: 'New Note',
+            submit: 'Create Note'
+        })
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+})
+app.post('/book/newNote/:id', async (req, res) => {
+    try {
+        console.log(req.params.id);
+        await db.query("insert into notes (content, page, bid) values ($1,$2, $3)", [req.body.content, req.body.page, req.params.id]);
+        res.redirect(`/book/${req.params.id}/notes`);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+})
+app.get('/book/:bid/note/:nid/edit', async (req, res) => {
+    try {
+        const value = await db.query("SELECT * FROM notes where id = $1",[req.params.nid]);
+        const note = value.rows;
+        console.log('note id: ' + req.params.nid);
+        console.log('book id: ' + req.params.bid);
+        console.log(note);
+        res.render('newBook.ejs',{
+            note: note[0],
+            nid: req.params.nid,
+            bid: req.params.bid,
+            heading: 'Edit Note',
+            submit: 'Update Note'
+        })
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+})
+app.post('/book/:bid/note/:nid/edit', async (req, res) => {
+    try {
+        await db.query("UPDATE notes SET content=$1, page=$2 WHERE id = $3",[req.body.content, req.body.page, req.params.nid]);
+        res.redirect(`/book/${req.params.bid}/notes`);
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+})
+app.get('/book/:bid/note/:nid/delete', async (req, res) =>{
+    try {
+        await db.query("DELETE FROM notes WHERE id = $1",[req.params.nid]);
+        res.redirect(`/book/${req.params.bid}/notes`);
     } catch (error) {
         res.status(500).json({message: error.message});
     }

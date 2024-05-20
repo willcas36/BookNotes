@@ -15,8 +15,12 @@
     width: 80%;
     margin: 50px auto;
 }
-.container{
+.description{
 
+}
+a{
+    text-decoration: none;
+    color: #444;
 }
 img{
     float: left;
